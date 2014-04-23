@@ -1,6 +1,6 @@
 require(ggplot2)
 
-setwd('~/Desktop/r scripts')
+#setwd('~/Desktop/r scripts')
 
 #reads in poverty series and makes index into colnames
 df.poverty <- read.csv('data/state2yrpovrate1993-2010.csv',na.strings = 'NA')
@@ -27,25 +27,31 @@ colnames(df.minwage) <- c('1988','1991','1992','1994','1996','1997','1998','2000
 df.minwage <- df.minwage[,c('1994','1996','1997','1998','2000','2001','2002','2003')]
 
 #makes column names distinguishable
-colnames(df.poverty) <- paste('p.',colnames(df.poverty))
-colnames(df.minwage) <- paste('mw.',colnames(df.minwage))
+#colnames(df.poverty) <- paste('p.',colnames(df.poverty))
+#colnames(df.minwage) <- paste('mw.',colnames(df.minwage))
 
 #joins two dataframes and removes memory storage of df.minwage
-df.poverty <- cbind(df.poverty,df.minwage)
-rm(df.minwage)
+#df.poverty <- cbind(df.poverty,df.minwage)
+#rm(df.minwage)
 
 
 #returns years with different minimum wages from previous year
 get.vlines <- function(col){
   #sets up comparison vector
-  lagged <- append(df.poverty[col,12:19],NA,after = 0)[1:8]
-  return(which(df.poverty[col,12:19] > lagged))
+  lagged <- append(df.minwage[col,],NA,after = 0)[1:8]
+  return(which(df.minwage[col,] > lagged))
 
 }
 
-makeggplots <- function() {
+makeggplots <- function(locale = 'U.S.') {
 #write it from scratch because this isn't working.
-
-  ggsave(filename=paste('plots/',as.character(row),'.png'),height=6)
-  }
+  
+  vlines <- get.vlines(locale)
+  cols <- colnames(df.poverty)
+  
+  pl <- ggplot(aes(x = cols[1:11],y = df.poverty[locale,1:11]))
+  pl <- pl + geom_point()
+  
+#  ggsave(filename=paste('plots/',locale,'.png'),height=6)
 }
+
