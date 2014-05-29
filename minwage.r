@@ -3,6 +3,7 @@ require(ggplot2)
 #setwd('~/Desktop/r scripts')
 
 #reads in poverty series and makes index into colnames
+#Source for poverty data: 
 df.poverty <- read.csv('data/state2yrpovrate1993-2010.csv',na.strings = 'NA')
 rownames(df.poverty) <- df.poverty[,'X']
 df.poverty <- df.poverty[colnames(df.poverty)[colnames(df.poverty)!='X']]
