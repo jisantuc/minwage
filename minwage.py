@@ -15,8 +15,26 @@ df_poverty = pd.read_csv('data/state2yrpovrate1993-2010reshaped.csv',
 df_minwage = pd.read_csv('data/minwage.csv',
                          na_values = '...')
 
+#replaces all NaNs with FLSA for that year
+for year in pd.unique(df_minwage['Year'].ravel()):
+    flsa = float(df_minwage['Minimum Wage'][df_minwage['State or other jurisdiction'] == 'FLSA'][df_minwage['Year'] == year])
+    df_minwage['Minimum Wage'][df_minwage['Year'] == year] = df_minwage['Minimum Wage'][df_minwage['Year'] == year].replace(np.nan,flsa)
 
-pl = ggplot(df_poverty, aes('Year','2 Yr Moving Average Poverty Rate')) + \
+
+#fixes geographic naming discrepancy between minwage and poverty datasets
+df_minwage['State or other jurisdiction'][df_minwage['State or other jurisdiction'] == 'District of Columbia'] = 'D.C.'
+df_minwage['State or other jurisdiction'][df_minwage['State or other jurisdiction'] == 'FLSA'] = 'U.S.'
+
+
+#method to get years in which minimum wage changes occurs for state
+def min_wage_change_years(data = df_minwage, state = 'Alabama'):
+    sample = data[data['State or other jurisdiction'] == state]
+    return sample['Year'][sample['Minimum Wage'].diff() > 0]
+
+print min_wage_change_years()
+print df_minwage[df_minwage['State or other jurisdiction'] == 'Alabama']
+
+"""pl = ggplot(df_poverty, aes('Year','2 Yr Moving Average Poverty Rate')) + \
             geom_point() + \
             geom_line() + \
             facet_wrap('State', scales = 'fixed') + \
@@ -27,4 +45,4 @@ pl = ggplot(df_poverty, aes('Year','2 Yr Moving Average Poverty Rate')) + \
 
 ggsave(pl,'plots/minwage_small.png')
 ggsave(pl,'plots/minwage_vs_poverty.png',height = 30, width = 40,
-       limitsize = False)
+       limitsize = False)"""
