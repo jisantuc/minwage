@@ -9,6 +9,10 @@ from ggplot import *
 #Poverty rates by state from source in readme
 df_poverty = pd.read_csv('data/state2yrpovrate1993-2010reshaped.csv',
                          na_values = 'NA')
+#Fixes obnoxious state labeling
+for a in df_poverty.index:
+    if df_poverty.ix[a,'State'][-1:] == '.' and df_poverty.ix[a,'State'] != 'D.C.':
+        df_poverty.ix[a,'State'] = df_poverty.ix[a,'State'][:-1]
 
 #Minwage dataframe from source in readme
 #Use to get vlines dataframe showing when minwage changed by geographic locale
@@ -27,22 +31,49 @@ df_minwage['State or other jurisdiction'][df_minwage['State or other jurisdictio
 
 
 #method to get years in which minimum wage changes occurs for state
-def min_wage_change_years(data = df_minwage, state = 'Alabama'):
+def min_wage_change_years(state, data = df_minwage):
+    #print state
     sample = data[data['State or other jurisdiction'] == state]
-    return sample['Year'][sample['Minimum Wage'].diff() > 0]
+    return list(sample['Year'][sample['Minimum Wage'].diff() > 0])
 
-print min_wage_change_years()
-print df_minwage[df_minwage['State or other jurisdiction'] == 'Alabama']
+vlines_data = pd.DataFrame(index = pd.unique(df_poverty['State'].ravel()),
+                           columns = ['vlines'])
 
-"""pl = ggplot(df_poverty, aes('Year','2 Yr Moving Average Poverty Rate')) + \
-            geom_point() + \
+#gets years in which minimum wage changes in each state
+for state in vlines_data.index:
+    vlines_data.ix[state,'vlines'] = min_wage_change_years(state = state)
+
+#facet_wrap is going to alphabetize based on state, so reindexing vlines_data to alphabetical version of itself
+sorting = list(vlines_data.index)
+sorting.sort()
+vlines_data = vlines_data.reindex(index = sorting)
+vlines_data['vs'] = np.repeat(range(8),8)[:52]
+vlines_data['am'] = np.tile(range(7),8)[:52]
+vlines_data['z'] = np.tile([1993,1994,1995,1996],13)
+
+#need to reshape vlines_data to one value per row. do that
+#by passing an array to np.repeat(obj, [val for val in something or other])
+
+#check that reindexing work
+#it does
+#print vlines_data
+
+#make the big ol' plot
+#to do: add vlines from vlines_data
+pl = ggplot(df_poverty, aes('Year','2 Yr Moving Average Poverty Rate')) + \
             geom_line() + \
             facet_wrap('State', scales = 'fixed') + \
             theme(axis_text_x = element_text(angle = 90)) + \
             xlab('Year') + \
             ylab('Poverty Rate') + \
-            ggtitle('Poverty Rates by State\nVertical Lines Indicate Changes in Minimum Wage')
+            ggtitle('Poverty Rates by State\nVertical Lines Indicate Changes in Minimum Wage') + \
+            xlim(1993,2005) + \
+            ylim(0,30)# + \
+#            geom_vline(aes(xintercept = 'z', color = 'red',linetype = 'longdash'),vlines_data)
+#            geom_point(aes(size = 0.5)) + \
+
+
 
 ggsave(pl,'plots/minwage_small.png')
-ggsave(pl,'plots/minwage_vs_poverty.png',height = 30, width = 40,
-       limitsize = False)"""
+#ggsave(pl,'plots/minwage_vs_poverty.png',height = 30, width = 40,
+#       limitsize = False)
