@@ -42,7 +42,9 @@ pl = ggplot(df, aes('Year','Value', colour = 'factor(Type)')) + \
             xlim(1993,2005) + \
             theme(axis_text_x = element_text(angle = 90,
                                              vjust = 1,
-                                             hjust = 1)) + \
+                                             hjust = 1,
+                                             size = 3),
+                         axis_text_y = element_text(size = 3)) + \
             ylab('')
 #            xlab('Year') + \
 #            ylab('Poverty Rate') + \
