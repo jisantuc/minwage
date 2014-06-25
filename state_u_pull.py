@@ -71,4 +71,4 @@ start_date = dt.datetime(1988,1,1)
 end_date = dt.datetime(2006,12,31)
 df_u = pd.concat([web.DataReader('{0}UR'.format(st), 'fred', start_date, end_date) for st in states.keys()])
 
-df_u.to_csv('check.csv')
+df_u.to_csv('data/state_u.csv')
