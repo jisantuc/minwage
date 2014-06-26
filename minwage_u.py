@@ -98,7 +98,7 @@ pl = ggplot(df, aes('Date','Value', colour = 'factor(Type)')) + \
             scale_colour_manual(values = colors) + \
             geom_line() + \
             facet_wrap('State', scales = 'fixed') + \
-            ggtitle('Unemployment Rate and Minimum Wage by State,\nStandardized') + \
+            ggtitle('Unemployment Rate and Minimum Wage by State, Standardized') + \
             xlim(1988,2006) + \
             theme(axis_text_x = element_text(angle = 0,
                                              vjust = 0,
